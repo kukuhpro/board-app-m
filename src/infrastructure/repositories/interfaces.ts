@@ -1,4 +1,4 @@
-import { Job } from '@/domain/entities/Job'
+import { Job, JobProps } from '@/domain/entities/Job'
 import { JobType } from '@/domain/valueObjects/JobType'
 
 /**

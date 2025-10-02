@@ -81,23 +81,25 @@ export const useAuthStore = create<AuthState>()(
       }),
       onRehydrateStorage: () => (state) => {
         // Reconstruct User entity from persisted data
-        if (state?.user) {
-          try {
-            const userData = state.user as any
-            state.user = new User({
-              id: userData.id,
-              email: userData.email,
-              createdAt: new Date(userData.createdAt),
-              metadata: userData.metadata
-            })
-            state.isAuthenticated = true
-          } catch (error) {
-            console.error('Error rehydrating user:', error)
-            state.user = null
-            state.isAuthenticated = false
+        if (state) {
+          if (state.user) {
+            try {
+              const userData = state.user as any
+              state.user = new User({
+                id: userData.id,
+                email: userData.email,
+                createdAt: new Date(userData.createdAt),
+                metadata: userData.metadata
+              })
+              state.isAuthenticated = true
+            } catch (error) {
+              console.error('Error rehydrating user:', error)
+              state.user = null
+              state.isAuthenticated = false
+            }
           }
+          state.isLoading = false
         }
-        state.isLoading = false
       }
     }
   )

@@ -1,4 +1,4 @@
-import { Job } from '@/domain/entities/Job'
+import { Job, JobProps } from '@/domain/entities/Job'
 import { JobType } from '@/domain/valueObjects/JobType'
 import { SupabaseAdapter } from '../adapters/SupabaseAdapter'
 import {
@@ -262,7 +262,7 @@ export class JobRepository implements IJobRepository {
    * Map database record to domain entity
    */
   private mapToDomainEntity(data: any): Job {
-    return {
+    return new Job({
       id: data.id,
       title: data.title,
       company: data.company,
@@ -272,7 +272,7 @@ export class JobRepository implements IJobRepository {
       userId: data.user_id,
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at)
-    }
+    })
   }
 
   /**
@@ -293,7 +293,7 @@ export class JobRepository implements IJobRepository {
    */
   async verifyOwnership(jobId: string, userId: string): Promise<boolean> {
     const job = await this.findById(jobId)
-    return job !== null && job.userId === userId
+    return job !== null && job.getUserId() === userId
   }
 
   /**

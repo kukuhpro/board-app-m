@@ -93,7 +93,8 @@ export function SWRProvider({ children }: SWRProviderProps) {
               clear: () => {
                 map.clear()
                 localStorage.removeItem('swr-cache')
-              }
+              },
+              keys: () => map.keys()
             }
           }
 

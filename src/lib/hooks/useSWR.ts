@@ -1,4 +1,5 @@
 import useSWR, { SWRConfiguration, SWRResponse } from 'swr'
+import { mutate } from 'swr'
 import useSWRInfinite from 'swr/infinite'
 
 /**
@@ -147,13 +148,13 @@ export async function prefetchJobs() {
 export const mutateJobs = () => {
   // Revalidate all job-related caches
   return Promise.all([
-    useSWR.mutate((key: string) => key.startsWith('/api/jobs')),
-    useSWR.mutate('/api/users/jobs'),
+    mutate((key: string) => typeof key === 'string' && key.startsWith('/api/jobs')),
+    mutate('/api/users/jobs'),
   ])
 }
 
 export const mutateJob = (id: string) => {
-  return useSWR.mutate(`/api/jobs/${id}`)
+  return mutate(`/api/jobs/${id}`)
 }
 
 /**
@@ -163,7 +164,7 @@ export function optimisticUpdate<T>(
   key: string,
   updateFn: (data: T) => T
 ): Promise<T | undefined> {
-  return useSWR.mutate(
+  return mutate(
     key,
     async (currentData: T | undefined) => {
       if (!currentData) return currentData
@@ -180,5 +181,5 @@ export function optimisticUpdate<T>(
  * Clear all SWR cache
  */
 export function clearCache() {
-  return useSWR.mutate(() => true, undefined, { revalidate: false })
+  return mutate(() => true, undefined, { revalidate: false })
 }

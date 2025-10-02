@@ -10,21 +10,15 @@ import { LoadingSpinner } from '@/components/atoms'
 
 // Lazy load heavy client-side components
 export const LazyFilterBar = lazy(() =>
-  import('@/components/molecules/FilterBar').then(module => ({
-    default: module.FilterBar
-  }))
+  import('@/components/molecules/FilterBar')
 )
 
 export const LazyJobCard = lazy(() =>
-  import('@/components/molecules/JobCard').then(module => ({
-    default: module.JobCard
-  }))
+  import('@/components/molecules/JobCard')
 )
 
 export const LazyEmptyState = lazy(() =>
-  import('@/components/molecules/EmptyState').then(module => ({
-    default: module.EmptyState
-  }))
+  import('@/components/molecules/EmptyState')
 )
 
 // Wrapper component for lazy loaded components with consistent loading state
@@ -52,7 +46,7 @@ export function LazyWrapper({ Component, props = {}, fallback }: LazyWrapperProp
 export function createLazyComponent<T extends ComponentType<any>>(
   importFunc: () => Promise<{ [key: string]: T }>,
   exportName: string = 'default'
-): ComponentType<T extends ComponentType<infer P> ? P : any> {
+) {
   return lazy(() =>
     importFunc().then(module => ({
       default: module[exportName] as T

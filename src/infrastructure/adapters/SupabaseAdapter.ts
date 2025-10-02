@@ -69,12 +69,16 @@ export class SupabaseAdapter implements IDatabaseAdapter {
 
   /**
    * Execute a query with parameters
+   * Note: For Supabase, sql param is treated as table name, params are filters
    */
-  async query<T = any>(tableName: string, filters?: Record<string, any>): Promise<T[]> {
+  async query<T = any>(sql: string, params?: any[]): Promise<T[]> {
+    // Treat sql as table name for Supabase compatibility
+    const tableName = sql
     let query = this.client.from(tableName).select('*')
 
-    // Apply filters if provided
-    if (filters) {
+    // Apply filters if provided (first param is filters object)
+    if (params && params.length > 0 && params[0]) {
+      const filters = params[0] as Record<string, any>
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           if (Array.isArray(value)) {
@@ -100,16 +104,23 @@ export class SupabaseAdapter implements IDatabaseAdapter {
 
   /**
    * Execute a single query with parameters
+   * Note: For Supabase, sql param is treated as table name, params are filters
    */
-  async queryOne<T = any>(tableName: string, filters?: Record<string, any>): Promise<T | null> {
-    const results = await this.query<T>(tableName, filters)
+  async queryOne<T = any>(sql: string, params?: any[]): Promise<T | null> {
+    const results = await this.query<T>(sql, params)
     return results.length > 0 ? results[0] : null
   }
 
   /**
    * Execute a mutation (insert, update, delete)
+   * Note: For Supabase, sql param contains operation info, params contain data
    */
-  async mutate(operation: string, tableName: string, data?: any, filters?: Record<string, any>): Promise<number> {
+  async mutate(sql: string, params?: any[]): Promise<number> {
+    // Parse sql as operation:tableName format (e.g., "insert:jobs", "update:jobs")
+    const [operation, tableName] = sql.split(':')
+    const data = params && params.length > 0 ? params[0] : undefined
+    const filters = params && params.length > 1 ? params[1] : undefined
+
     let result: any
 
     switch (operation.toLowerCase()) {

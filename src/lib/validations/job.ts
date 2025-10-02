@@ -101,8 +101,8 @@ export const validateRegister = (data: unknown) => {
 export const formatZodErrors = (errors: z.ZodError) => {
   const formatted: Record<string, string> = {}
 
-  if (errors && errors.errors) {
-    errors.errors.forEach((error) => {
+  if (errors && errors.issues) {
+    errors.issues.forEach((error) => {
       const path = error.path.join('.')
       formatted[path] = error.message
     })
@@ -113,8 +113,8 @@ export const formatZodErrors = (errors: z.ZodError) => {
 
 // Helper to get first error message
 export const getFirstErrorMessage = (errors: z.ZodError): string => {
-  if (errors && errors.errors && errors.errors.length > 0) {
-    return errors.errors[0].message
+  if (errors && errors.issues && errors.issues.length > 0) {
+    return errors.issues[0].message
   }
   return 'Validation error'
 }

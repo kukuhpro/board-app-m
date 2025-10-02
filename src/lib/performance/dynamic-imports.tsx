@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic'
-import { ComponentType } from 'react'
+import React, { ComponentType } from 'react'
 
 /**
  * Dynamic import configuration for code splitting
@@ -8,7 +8,7 @@ import { ComponentType } from 'react'
 
 // Heavy organisms - loaded when needed
 export const DynamicAuthForm = dynamic(
-  () => import('@/components/organisms/AuthForm').then(mod => ({ default: mod.AuthForm })),
+  () => import('@/components/organisms/AuthForm'),
   {
     loading: () => <div className="h-96 animate-pulse bg-gray-100 rounded-lg" />,
     ssr: false // Auth forms don't need SSR
@@ -16,7 +16,7 @@ export const DynamicAuthForm = dynamic(
 )
 
 export const DynamicJobForm = dynamic(
-  () => import('@/components/organisms/JobForm').then(mod => ({ default: mod.JobForm })),
+  () => import('@/components/organisms/JobForm'),
   {
     loading: () => <div className="h-96 animate-pulse bg-gray-100 rounded-lg" />,
     ssr: true
@@ -24,7 +24,7 @@ export const DynamicJobForm = dynamic(
 )
 
 export const DynamicJobList = dynamic(
-  () => import('@/components/organisms/JobList').then(mod => ({ default: mod.JobList })),
+  () => import('@/components/organisms/JobList'),
   {
     loading: () => (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -39,7 +39,7 @@ export const DynamicJobList = dynamic(
 
 // Heavy templates - loaded per route
 export const DynamicDashboardLayout = dynamic(
-  () => import('@/components/templates/DashboardLayout').then(mod => ({ default: mod.DashboardLayout })),
+  () => import('@/components/templates/DashboardLayout'),
   {
     loading: () => <div className="min-h-screen animate-pulse bg-gray-50" />,
     ssr: false // Dashboard is authenticated only
@@ -47,7 +47,7 @@ export const DynamicDashboardLayout = dynamic(
 )
 
 export const DynamicJobLayout = dynamic(
-  () => import('@/components/templates/JobLayout').then(mod => ({ default: mod.JobLayout })),
+  () => import('@/components/templates/JobLayout'),
   {
     loading: () => <div className="min-h-screen animate-pulse bg-gray-50" />,
     ssr: true
@@ -56,7 +56,7 @@ export const DynamicJobLayout = dynamic(
 
 // Modal components - only loaded when triggered
 export const DynamicFilterBar = dynamic(
-  () => import('@/components/molecules/FilterBar').then(mod => ({ default: mod.FilterBar })),
+  () => import('@/components/molecules/FilterBar'),
   {
     loading: () => <div className="h-20 animate-pulse bg-gray-100 rounded-lg mb-6" />,
     ssr: false
@@ -67,7 +67,7 @@ export const DynamicFilterBar = dynamic(
 export function createDynamicComponent<T extends ComponentType<any>>(
   loader: () => Promise<{ default: T }>,
   options?: {
-    loading?: ComponentType
+    loading?: () => React.ReactElement
     ssr?: boolean
   }
 ): ComponentType<T extends ComponentType<infer P> ? P : any> {
