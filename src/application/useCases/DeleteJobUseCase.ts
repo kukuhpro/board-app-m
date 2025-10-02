@@ -59,7 +59,7 @@ export class DeleteJobUseCase {
       }
 
       // Verify ownership - only the creator can delete the job (unless force delete by admin)
-      if (!forceDelete && existingJob.userId !== userId) {
+      if (!forceDelete && existingJob.getUserId() !== userId) {
         return {
           success: false,
           error: 'You do not have permission to delete this job'
@@ -70,12 +70,12 @@ export class DeleteJobUseCase {
       const oneHourAgo = new Date()
       oneHourAgo.setHours(oneHourAgo.getHours() - 1)
 
-      if (existingJob.createdAt > oneHourAgo && !forceDelete) {
+      if (existingJob.getCreatedAt() > oneHourAgo && !forceDelete) {
         // In a real application, you might want to require additional confirmation
         console.warn('Deleting recently created job:', {
           jobId,
-          createdAt: existingJob.createdAt,
-          title: existingJob.title
+          createdAt: existingJob.getCreatedAt(),
+          title: existingJob.getTitle()
         })
       }
 
@@ -83,7 +83,7 @@ export class DeleteJobUseCase {
       const lastUpdateThreshold = new Date()
       lastUpdateThreshold.setMinutes(lastUpdateThreshold.getMinutes() - 5)
 
-      if (existingJob.updatedAt > lastUpdateThreshold && !forceDelete) {
+      if (existingJob.getUpdatedAt() > lastUpdateThreshold && !forceDelete) {
         return {
           success: false,
           error: 'This job was recently updated. Please wait a few minutes before deleting to prevent accidental deletion.'

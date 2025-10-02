@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useIsAuthenticated } from "@/stores/authStore";
 import { JobForm } from "@/components/organisms";
 import { LoadingSpinner } from "@/components/atoms";
-import { CreateJobSchema } from "@/lib/validations/job";
-import type { CreateJobInput } from "@/lib/validations/job";
+import type { CreateJobInput, UpdateJobInput } from "@/lib/validations/job";
 import Link from "next/link";
 
 export default function CreateJobPage() {
@@ -20,7 +19,7 @@ export default function CreateJobPage() {
     }
   }, [isAuthenticated]);
 
-  const handleSubmit = async (data: CreateJobInput) => {
+  const handleSubmit = async (data: CreateJobInput | UpdateJobInput) => {
     try {
       const response = await fetch("/api/jobs", {
         method: "POST",
@@ -97,7 +96,6 @@ export default function CreateJobPage() {
               mode="create"
               onSubmit={handleSubmit}
               onCancel={handleCancel}
-              schema={CreateJobSchema}
             />
           </div>
         </div>

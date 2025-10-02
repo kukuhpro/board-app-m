@@ -22,7 +22,7 @@ export class JobRepository implements IJobRepository {
   /**
    * Create a new job
    */
-  async create(job: Omit<Job, 'id' | 'createdAt' | 'updatedAt'>): Promise<Job> {
+  async create(job: Omit<JobProps, 'id' | 'createdAt' | 'updatedAt'>): Promise<Job> {
     const client = this.adapter.getClient()
 
     const { data, error } = await client
@@ -150,7 +150,7 @@ export class JobRepository implements IJobRepository {
    */
   async update(
     id: string,
-    data: Partial<Omit<Job, 'id' | 'createdAt' | 'updatedAt'>>
+    data: Partial<Omit<JobProps, 'id' | 'createdAt' | 'updatedAt'>>
   ): Promise<Job> {
     const client = this.adapter.getClient()
 

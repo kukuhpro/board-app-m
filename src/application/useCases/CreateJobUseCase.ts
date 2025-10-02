@@ -165,9 +165,9 @@ export class CreateJobUseCase {
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
       return recentJobs.data.some(job =>
-        job.title.toLowerCase() === title.toLowerCase() &&
-        job.company.toLowerCase() === company.toLowerCase() &&
-        job.createdAt > sevenDaysAgo
+        job.getTitle().toLowerCase() === title.toLowerCase() &&
+        job.getCompany().toLowerCase() === company.toLowerCase() &&
+        job.getCreatedAt() > sevenDaysAgo
       )
     } catch (error) {
       console.error('Error checking for duplicates:', error)
@@ -184,11 +184,11 @@ export class CreateJobUseCase {
   private logJobCreation(job: Job, userId: string): void {
     // In a production system, this would send to a logging service
     console.log('Job created:', {
-      jobId: job.id,
-      title: job.title,
-      company: job.company,
+      jobId: job.getId(),
+      title: job.getTitle(),
+      company: job.getCompany(),
       userId,
-      createdAt: job.createdAt
+      createdAt: job.getCreatedAt()
     })
   }
 

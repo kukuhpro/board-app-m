@@ -42,7 +42,7 @@ export interface IJobRepository {
    * @param job The job data to create
    * @returns The created job with generated ID
    */
-  create(job: Omit<Job, 'id' | 'createdAt' | 'updatedAt'>): Promise<Job>
+  create(job: Omit<JobProps, 'id' | 'createdAt' | 'updatedAt'>): Promise<Job>
 
   /**
    * Find a job by ID
@@ -79,7 +79,7 @@ export interface IJobRepository {
    * @param data The partial job data to update
    * @returns The updated job
    */
-  update(id: string, data: Partial<Omit<Job, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Job>
+  update(id: string, data: Partial<Omit<JobProps, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Job>
 
   /**
    * Delete a job

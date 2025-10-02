@@ -1,4 +1,4 @@
-import { Job } from '@/domain/entities/Job'
+import { Job, JobProps } from '@/domain/entities/Job'
 import { JobType } from '@/domain/valueObjects/JobType'
 import { IJobRepository } from '@/infrastructure/repositories/interfaces'
 import { JobRepository } from '@/infrastructure/repositories/JobRepository'
@@ -70,7 +70,7 @@ export class UpdateJobUseCase {
       }
 
       // Verify ownership - only the creator can update the job
-      if (existingJob.userId !== userId) {
+      if (existingJob.getUserId() !== userId) {
         return {
           success: false,
           error: 'You do not have permission to update this job'
@@ -81,7 +81,7 @@ export class UpdateJobUseCase {
       const ninetyDaysAgo = new Date()
       ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
 
-      if (existingJob.createdAt < ninetyDaysAgo) {
+      if (existingJob.getCreatedAt() < ninetyDaysAgo) {
         return {
           success: false,
           error: 'Jobs older than 90 days cannot be edited. Please create a new posting instead.'
@@ -111,7 +111,7 @@ export class UpdateJobUseCase {
       const validatedData = validationResult.data
 
       // Business rule: Check if company name is being changed and validate
-      if (validatedData.company && validatedData.company !== existingJob.company) {
+      if (validatedData.company && validatedData.company !== existingJob.getCompany()) {
         if (this.isCompanyBlacklisted(validatedData.company)) {
           return {
             success: false,
@@ -129,7 +129,7 @@ export class UpdateJobUseCase {
       }
 
       // Prepare update data
-      const updateData: Partial<Omit<Job, 'id' | 'createdAt' | 'updatedAt'>> = {}
+      const updateData: Partial<Omit<JobProps, 'id' | 'createdAt' | 'updatedAt'>> = {}
 
       if (validatedData.title !== undefined) {
         updateData.title = validatedData.title
@@ -197,7 +197,7 @@ export class UpdateJobUseCase {
     const twentyFourHoursAgo = new Date()
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24)
 
-    return job.createdAt > twentyFourHoursAgo
+    return job.getCreatedAt() > twentyFourHoursAgo
   }
 
   /**
@@ -210,30 +210,30 @@ export class UpdateJobUseCase {
     const changes: Record<string, { old: any; new: any }> = {}
 
     // Track what changed
-    if (oldJob.title !== newJob.title) {
-      changes.title = { old: oldJob.title, new: newJob.title }
+    if (oldJob.getTitle() !== newJob.getTitle()) {
+      changes.title = { old: oldJob.getTitle(), new: newJob.getTitle() }
     }
-    if (oldJob.company !== newJob.company) {
-      changes.company = { old: oldJob.company, new: newJob.company }
+    if (oldJob.getCompany() !== newJob.getCompany()) {
+      changes.company = { old: oldJob.getCompany(), new: newJob.getCompany() }
     }
-    if (oldJob.description !== newJob.description) {
+    if (oldJob.getDescription() !== newJob.getDescription()) {
       changes.description = {
-        old: oldJob.description.substring(0, 100) + '...',
-        new: newJob.description.substring(0, 100) + '...'
+        old: oldJob.getDescription().substring(0, 100) + '...',
+        new: newJob.getDescription().substring(0, 100) + '...'
       }
     }
-    if (oldJob.location !== newJob.location) {
-      changes.location = { old: oldJob.location, new: newJob.location }
+    if (oldJob.getLocation() !== newJob.getLocation()) {
+      changes.location = { old: oldJob.getLocation(), new: newJob.getLocation() }
     }
-    if (oldJob.jobType !== newJob.jobType) {
-      changes.jobType = { old: oldJob.jobType, new: newJob.jobType }
+    if (oldJob.getJobType() !== newJob.getJobType()) {
+      changes.jobType = { old: oldJob.getJobType(), new: newJob.getJobType() }
     }
 
     // In a production system, this would send to a logging service
     console.log('Job updated:', {
-      jobId: newJob.id,
+      jobId: newJob.getId(),
       userId,
-      updatedAt: newJob.updatedAt,
+      updatedAt: newJob.getUpdatedAt(),
       changes
     })
   }

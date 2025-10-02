@@ -92,7 +92,7 @@ export class GetJobsUseCase {
       }
 
       // Validate ordering options
-      if (!this.isValidOrderBy(pagination.orderBy)) {
+      if (pagination.orderBy && !this.isValidOrderBy(pagination.orderBy)) {
         return {
           success: false,
           error: 'Invalid order by field'
@@ -312,13 +312,7 @@ export class GetJobsUseCase {
     // 3. Add application counts
     // 4. Check if user has applied (if authenticated)
 
-    return {
-      ...result,
-      data: result.data.map(job => ({
-        ...job,
-        // Add any enhancements here
-      }))
-    }
+    return result
   }
 
   /**

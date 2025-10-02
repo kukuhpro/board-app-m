@@ -181,12 +181,9 @@ const JobLayout: React.FC<JobLayoutProps> = ({
                     </div>
 
                     <FilterBar
-                      location={filters.location}
-                      jobType={filters.jobType}
+                      currentFilters={{ location: filters.location || '', jobType: filters.jobType || '' }}
                       onLocationChange={handleLocationChange}
-                      onJobTypeChange={handleJobTypeChange}
-                      onClearFilters={handleClearFilters}
-                      orientation="vertical"
+                      onTypeChange={(jobType) => handleJobTypeChange(jobType as JobType | undefined)}
                     />
 
                     {/* Additional Filter Stats */}

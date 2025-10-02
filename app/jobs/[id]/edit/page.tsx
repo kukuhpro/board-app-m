@@ -5,8 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { useIsAuthenticated } from '@/stores/authStore'
 import { JobForm } from '@/components/organisms'
 import { LoadingSpinner } from '@/components/atoms'
-import { UpdateJobSchema } from '@/lib/validations/job'
-import type { UpdateJobInput } from '@/lib/validations/job'
+import type { CreateJobInput, UpdateJobInput } from '@/lib/validations/job'
 import { JobProps } from '@/domain/entities/Job'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -77,7 +76,7 @@ export default function EditJobPage() {
     }
   }
 
-  const handleSubmit = async (data: UpdateJobInput) => {
+  const handleSubmit = async (data: CreateJobInput | UpdateJobInput) => {
     try {
       const response = await fetch(`/api/jobs/${jobId}`, {
         method: 'PUT',
@@ -222,7 +221,6 @@ export default function EditJobPage() {
               }}
               onSubmit={handleSubmit}
               onCancel={handleCancel}
-              schema={UpdateJobSchema}
             />
           </div>
         </div>

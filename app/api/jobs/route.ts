@@ -50,7 +50,7 @@ export const GET = withTelemetry(async function GET(request: NextRequest) {
 
         if (result.success && result.data) {
           addSpanAttributes(span, {
-            'jobs.result.count': result.data.jobs?.length || 0,
+            'jobs.result.count': result.data.data?.length || 0,
             'jobs.result.total': result.data.total,
             'jobs.result.hasMore': result.data.hasMore,
           })
@@ -148,7 +148,7 @@ export const POST = withTelemetry(async function POST(request: NextRequest) {
 
         if (result.success && result.job) {
           addSpanAttributes(span, {
-            'jobs.create.jobId': result.job.id,
+            'jobs.create.jobId': result.job.getId(),
             'jobs.create.success': true,
           })
         } else {

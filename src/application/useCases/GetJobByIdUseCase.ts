@@ -1,4 +1,4 @@
-import { Job } from '@/domain/entities/Job'
+import { Job, JobProps } from '@/domain/entities/Job'
 import { IJobRepository } from '@/infrastructure/repositories/interfaces'
 import { JobRepository } from '@/infrastructure/repositories/JobRepository'
 
@@ -58,7 +58,7 @@ export class GetJobByIdUseCase {
       }
 
       // Check if the current user is the owner
-      const isOwner = userId ? job.userId === userId : false
+      const isOwner = userId ? job.getUserId() === userId : false
 
       // Determine if user can edit this job
       const canEdit = isOwner && this.canJobBeEdited(job)
@@ -169,7 +169,7 @@ export class GetJobByIdUseCase {
     const ninetyDaysAgo = new Date()
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
 
-    if (job.createdAt < ninetyDaysAgo) {
+    if (job.getCreatedAt() < ninetyDaysAgo) {
       return false
     }
 
@@ -193,9 +193,9 @@ export class GetJobByIdUseCase {
     // 3. Track user behavior for recommendations
 
     const viewData = {
-      jobId: job.id,
-      jobTitle: job.title,
-      company: job.company,
+      jobId: job.getId(),
+      jobTitle: job.getTitle(),
+      company: job.getCompany(),
       viewedAt: new Date(),
       viewerId: userId || 'anonymous',
       referrer: 'direct', // Would get from request headers
@@ -205,7 +205,7 @@ export class GetJobByIdUseCase {
     console.log('Job view tracked:', viewData)
 
     // Update view count in cache
-    await this.incrementViewCount(job.id)
+    await this.incrementViewCount(job.getId())
   }
 
   /**
@@ -233,15 +233,10 @@ export class GetJobByIdUseCase {
     // 5. Formatted salary range
     // 6. Benefits and perks
 
-    const enhanced = {
-      ...job,
-      // Add any enhancements here
-    }
-
     // Add time-based calculations
     const now = new Date()
     const daysAgo = Math.floor(
-      (now.getTime() - job.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - job.getCreatedAt().getTime()) / (1000 * 60 * 60 * 24)
     )
 
     // Add metadata (this would normally be separate fields)
@@ -251,7 +246,7 @@ export class GetJobByIdUseCase {
       isUrgent: daysAgo >= 30, // Older jobs might be more urgent to fill
     })
 
-    return enhanced
+    return job
   }
 
   /**
@@ -264,9 +259,9 @@ export class GetJobByIdUseCase {
       // Find jobs with similar criteria
       const filters = {
         // Same location
-        location: job.location,
+        location: job.getLocation(),
         // Same job type
-        jobType: job.jobType
+        jobType: job.getJobType()
       }
 
       const result = await this.jobRepository.findAll(
@@ -280,7 +275,7 @@ export class GetJobByIdUseCase {
       )
 
       // Filter out the current job
-      return result.data.filter(j => j.id !== job.id)
+      return result.data.filter(j => j.getId() !== job.getId())
     } catch (error) {
       console.error('Error finding related jobs:', error)
       return []
@@ -294,7 +289,7 @@ export class GetJobByIdUseCase {
    */
   async getJobPreview(jobId: string): Promise<{
     success: boolean
-    preview?: Partial<Job>
+    preview?: Partial<JobProps>
     error?: string
   }> {
     const result = await this.execute(jobId)
@@ -307,14 +302,14 @@ export class GetJobByIdUseCase {
     return {
       success: true,
       preview: {
-        id: result.job.id,
-        title: result.job.title,
-        company: result.job.company,
-        location: result.job.location,
-        jobType: result.job.jobType,
-        createdAt: result.job.createdAt,
+        id: result.job.getId(),
+        title: result.job.getTitle(),
+        company: result.job.getCompany(),
+        location: result.job.getLocation(),
+        jobType: result.job.getJobType(),
+        createdAt: result.job.getCreatedAt(),
         // Truncated description for preview
-        description: result.job.description.substring(0, 200) + '...'
+        description: result.job.getDescription().substring(0, 200) + '...'
       }
     }
   }
